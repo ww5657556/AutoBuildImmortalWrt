@@ -16,7 +16,7 @@ uci add wireless wifi-iface
 uci set wireless.@wifi-iface[-1].device='radio0'  # mediatek/filogic 2.4G默认节点
 uci set wireless.@wifi-iface[-1].network='lan'
 uci set wireless.@wifi-iface[-1].mode='ap'
-uci set wireless.@wifi-iface[-1].ssid='dong'  # 预设2.4G SSID
+uci set wireless.@wifi-iface[-1].ssid='dong2.4'  # 预设2.4G SSID
 uci set wireless.@wifi-iface[-1].encryption='psk2'  # WPA2-PSK加密
 uci set wireless.@wifi-iface[-1].key='m707055060@'  # 预设2.4G密码
 uci set wireless.@wifi-iface[-1].disabled='1'  # 核心：禁用2.4G接口（仅保留配置）
