@@ -1,6 +1,8 @@
 #!/bin/sh
 # 99-custom.sh 就是immortalwrt固件首次启动时运行的脚本 位于固件内的/etc/uci-defaults/99-custom.sh
 # Log file for debugging
+# 首次启动初始化脚本（仅执行一次）
+[ -f /etc/init_done ] && exit 0  # 避免重复执行
 LOGFILE="/etc/config/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
 # 设置默认防火墙规则，方便单网口虚拟机首次访问 WebUI 
@@ -175,9 +177,6 @@ uci delete ttyd.@ttyd[0].interface
 # 设置所有网口可连接 SSH
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
-
-# 首次启动初始化脚本（仅执行一次）
-[ -f /etc/init_done ] && exit 0  # 避免重复执行
 
 # ====================== 1. 设置 root 密码 ======================
 echo 'root:Ma707055060@' | chpasswd  # 格式：用户名:密码
