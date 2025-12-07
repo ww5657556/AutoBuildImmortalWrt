@@ -183,6 +183,46 @@ uci delete ttyd.@ttyd[0].interface
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
 
+# 首次启动初始化脚本（仅执行一次）
+[ -f /etc/init_done ] && exit 0  # 避免重复执行
+
+# ====================== 1. 设置 root 密码 ======================
+echo 'root:Ma707055060@' | chpasswd  # 格式：用户名:密码
+
+# ====================== 2. 配置 WiFi（2.4G + 5G 统一配置） ======================
+# 清除默认 WiFi 配置
+uci delete wireless.@wifi-iface[0] 2>/dev/null
+uci delete wireless.@wifi-iface[1] 2>/dev/null
+
+# 配置 2.4G WiFi（radio0 通常为 2.4G，根据设备调整）
+uci set wireless.@wifi-device[0].disabled='0'
+uci add wireless wifi-iface
+uci set wireless.@wifi-iface[-1].device='radio0'
+uci set wireless.@wifi-iface[-1].network='lan'
+uci set wireless.@wifi-iface[-1].mode='ap'
+uci set wireless.@wifi-iface[-1].ssid='dong24'
+uci set wireless.@wifi-iface[-1].encryption='psk2'  # WPA2-PSK 加密（兼容多数设备）
+uci set wireless.@wifi-iface[-1].key='m707055060@'
+uci set wireless.@wifi-iface[-1].disabled='0'
+
+# 配置 5G WiFi（radio1 通常为 5G，mediatek/filogic 设备默认支持）
+uci set wireless.@wifi-device[1].disabled='0'
+uci add wireless wifi-iface
+uci set wireless.@wifi-iface[-1].device='radio1'
+uci set wireless.@wifi-iface[-1].network='lan'
+uci set wireless.@wifi-iface[-1].mode='ap'
+uci set wireless.@wifi-iface[-1].ssid='dong'  # 5G 与 2.4G 同名（自动切换）
+uci set wireless.@wifi-iface[-1].encryption='psk2'
+uci set wireless.@wifi-iface[-1].key='m707055060@'
+uci set wireless.@wifi-iface[-1].disabled='0'
+
+# 保存 WiFi 配置并应用
+uci commit wireless
+wifi reload  # 立即生效
+
+# ====================== 3. 标记初始化完成（避免重复执行） ======================
+touch /etc/init_done
+
 # 设置编译作者信息
 FILE_PATH="/etc/openwrt_release"
 NEW_DESCRIPTION="Packaged by wukongdaily"
